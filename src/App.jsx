@@ -1,8 +1,13 @@
+import { Routes, Route } from "react-router-dom";
+import HomePage from "./pages/Home";
+import NotFound from "./pages/NotFound";
+
 function App() {
   return (
-    <>
-      <h1 className="text-blue-400 text-2xl ">My name is Arpan Katiyar</h1>
-    </>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
