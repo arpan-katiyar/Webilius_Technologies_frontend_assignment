@@ -1,6 +1,6 @@
 // src/components/AIResults.jsx
 import { useEffect, useState } from "react";
-import mockJobs from "../utils/mockAI"; // We'll create this next
+import mockJobs from "../utils/mockJobs"; // We'll create this next
 
 function AIResults() {
   const [jobs, setJobs] = useState([]);

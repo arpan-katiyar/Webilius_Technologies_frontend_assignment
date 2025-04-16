@@ -1,33 +1,24 @@
-// src/components/ResumeUpload.jsx
-import { useState } from "react";
-
-function ResumeUpload() {
-  const [fileName, setFileName] = useState("");
-
-  const handleFileChange = (e) => {
+const ResumeUpload = ({ onUpload }) => {
+  const handleChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.type === "application/pdf") {
-      setFileName(file.name);
-      // You can pass it to AI logic or show a toast
-    } else {
-      alert("Please upload a valid PDF file");
-    }
+    if (file) onUpload(file);
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow mb-4">
-      <label className="block text-sm font-medium mb-2">
-        Upload Resume (PDF):
-      </label>
-      <input
-        type="file"
-        accept=".pdf"
-        onChange={handleFileChange}
-        className="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer focus:outline-none"
+    <div>
+      <input 
+        type="file" 
+        accept=".pdf,application/pdf" 
+        onChange={handleChange}
+        className="block w-full text-sm text-gray-500
+          file:mr-4 file:py-2 file:px-4
+          file:rounded-md file:border-0
+          file:text-sm file:font-semibold
+          file:bg-blue-50 file:text-blue-700
+          hover:file:bg-blue-100"
       />
-      {fileName && <p className="mt-2 text-green-600">Uploaded: {fileName}</p>}
+      <p className="mt-1 text-sm text-gray-500">Upload your resume in PDF format</p>
     </div>
   );
-}
-
-export default ResumeUpload;
+};
+export default ResumeUpload
