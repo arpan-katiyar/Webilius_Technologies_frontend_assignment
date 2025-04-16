@@ -21,10 +21,8 @@ const Home = () => {
       const skills = extractSkills(resumeContent);
       const experience = extractExperience(resumeContent);
       
-      if (!skills || !experience) {
-        throw new Error("Failed to extract skills or experience");
-      }
-
+      // Removed the error check here
+  
       const jobs = matchJobs(mockJobs, skills, experience);
       setMatchedJobs(jobs || []);
     } catch (error) {

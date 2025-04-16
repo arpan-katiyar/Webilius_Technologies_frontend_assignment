@@ -157,7 +157,7 @@ export const mockJobs = [
   },
 
   {
-    id: 2,
+    id: 16,
     title: "Backend Developer",
     company: "CodeForge Ltd.",
     location: "Bangalore",
@@ -166,4 +166,5 @@ export const mockJobs = [
     description:
       "Develop scalable backend services and RESTful APIs for our core products.",
   },
+  
 ];
