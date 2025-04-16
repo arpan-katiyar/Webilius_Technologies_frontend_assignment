@@ -166,5 +166,4 @@ export const mockJobs = [
     description:
       "Develop scalable backend services and RESTful APIs for our core products.",
   },
-  
 ];

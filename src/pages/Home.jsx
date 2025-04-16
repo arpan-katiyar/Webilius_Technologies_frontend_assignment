@@ -16,13 +16,13 @@ const Home = () => {
   const processResume = async (resumeContent) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const skills = extractSkills(resumeContent);
       const experience = extractExperience(resumeContent);
-      
+
       // Removed the error check here
-  
+
       const jobs = matchJobs(mockJobs, skills, experience);
       setMatchedJobs(jobs || []);
     } catch (error) {
@@ -39,7 +39,7 @@ const Home = () => {
       setError("Please select a file");
       return;
     }
-    
+
     try {
       const resumeText = await parseResumeFromPDF(file);
       await processResume(resumeText);
@@ -57,18 +57,26 @@ const Home = () => {
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-center">Job Match Finder</h1>
-      
+    <div className="p-4 max-w-4xl mx-auto ">
+      <h1 className="text-2xl font-bold mb-6 text-center">AI-Powered Job Board</h1>
+
       <div className="flex mb-4 border-b">
         <button
-          className={`px-4 py-2 font-medium ${inputType === "pdf" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"}`}
+          className={`px-4 py-2 font-medium ${
+            inputType === "pdf"
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-500"
+          }`}
           onClick={() => setInputType("pdf")}
         >
           Upload PDF
         </button>
         <button
-          className={`px-4 py-2 font-medium ${inputType === "text" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"}`}
+          className={`px-4 py-2 font-medium ${
+            inputType === "text"
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-500"
+          }`}
           onClick={() => setInputType("text")}
         >
           Paste Text
@@ -85,9 +93,11 @@ const Home = () => {
               placeholder="Paste your resume text here..."
               onBlur={(e) => handleTextSubmit(e.target.value)}
             />
-            <button 
+            <button
               className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              onClick={(e) => handleTextSubmit(e.target.previousElementSibling.value)}
+              onClick={(e) =>
+                handleTextSubmit(e.target.previousElementSibling.value)
+              }
             >
               Analyze Text
             </button>
@@ -109,14 +119,16 @@ const Home = () => {
         </div>
       ) : matchedJobs.length > 0 ? (
         <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Top Matches ({matchedJobs.length})</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Top Matches ({matchedJobs.length})
+          </h2>
           <JobList jobs={matchedJobs} />
         </div>
       ) : (
         <div className="mt-8 text-center">
           <p className="text-gray-500">
-            {inputType === "pdf" 
-              ? "Upload your PDF resume to discover matching jobs" 
+            {inputType === "pdf"
+              ? "Upload your PDF resume to discover matching jobs"
               : "Paste your resume text to discover matching jobs"}
           </p>
         </div>

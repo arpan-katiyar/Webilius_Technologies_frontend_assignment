@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import "./styles/animations.css";
 
 function App() {
   return (
