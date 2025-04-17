@@ -1,3 +1,4 @@
+
 export function extractExperience(resumeText) {
   if (!resumeText || typeof resumeText !== "string") {
     console.warn("Invalid resume text provided");
@@ -7,47 +8,39 @@ export function extractExperience(resumeText) {
   try {
     // ✅ Normalize resume text before section extraction
     const normalizedResumeText = resumeText
-      .replace(
-        /\b(currently?|present(ly)?|now|till\s+date|ongoing|presently)\b/gi,
-        "Present"
-      )
+      .replace(/\b(currently?|present(ly)?|now|till\s+date|ongoing)\b/gi, "Present")
       .replace(/\s+/g, " ")
       .replace(/[\u2013\u2014—]/g, "-") // Normalize en-dash/em-dash to regular dash
       .replace(/\b(\d{1,2})(?:st|nd|rd|th)\b/g, "$1");
 
     const experienceSection = getExperienceSection(normalizedResumeText);
-
     if (!experienceSection) {
       console.warn("No experience section found in resume");
       return 0;
     }
 
-    // Continue with already-normalized section
     const normalizedText = experienceSection;
 
-    // Try explicit experience mention first
     const explicitMatch = normalizedText.match(
-      /(\d+(?:\.\d+)?)\s*(?:years?|yrs?|years of experience|yoe)\b/i
+      /(\d+(?:\.\d+)?)\s*(?:years?|yrs?|yoe|years of experience)\b/i
     );
     if (explicitMatch) {
       return parseFloat(explicitMatch[1]);
     }
 
     const dateRangePattern =
-      /(?:\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{4}|\b\d{1,2}[\/\-]\d{4}|\b\d{4}|\b(?:Q[1-4]|Quarter [1-4])\s+\d{4})\s*(?:-|to|–|until|till|\s)\s*(?:\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?|\d{1,2}[\/\-]\d{4}|\d{4}|Present|current(?:ly)?|now|till\s+date|ongoing|presently)\b)/gi;
+      /(?:\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?|\d{1,2}[\/\-]\d{4}|\d{4}|(?:Q[1-4]|Quarter [1-4])\s+\d{4})\b)\s*(?:-|to|–|until|till)\s*(?:\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?|\d{1,2}[\/\-]\d{4}|\d{4}|Present|current(?:ly)?|now|till\s+date|ongoing)\b)/gi;
 
     let totalExperience = 0;
     let hasValidRange = false;
     const seenRanges = new Set();
 
-    for (const range of normalizedText.matchAll(dateRangePattern)) {
-      const rangeStr = range[0];
+    for (const match of normalizedText.matchAll(dateRangePattern)) {
+      const rangeStr = match[0];
       if (seenRanges.has(rangeStr)) continue;
       seenRanges.add(rangeStr);
 
-      const [startPart, endPart] = rangeStr.split(
-        /\s*(?:-|to|–|until|till)\s*/
-      );
+      const [startPart, endPart] = rangeStr.split(/\s*(?:-|to|–|until|till)\s*/);
 
       try {
         const startDate = parseDate(startPart.trim());
@@ -55,8 +48,7 @@ export function extractExperience(resumeText) {
 
         if (!isNaN(startDate.getTime())) {
           const endTime = !isNaN(endDate.getTime()) ? endDate : new Date();
-          const diffYears =
-            (endTime - startDate) / (1000 * 60 * 60 * 24 * 365.25);
+          const diffYears = (endTime - startDate) / (1000 * 60 * 60 * 24 * 365.25);
 
           if (diffYears > 0) {
             totalExperience += diffYears;
@@ -72,9 +64,8 @@ export function extractExperience(resumeText) {
       return parseFloat(totalExperience.toFixed(1));
     }
 
-    // Fallback: detect seniority levels
     const seniorityMatch = normalizedText.match(
-      /(?:senior|sr\.|lead|principal|manager|director|head of|staff)\b/gi
+      /\b(senior|sr\.|lead|principal|manager|director|head of|staff)\b/gi
     );
     if (seniorityMatch) {
       return seniorityMatch.length >= 2 ? 8 : 5;
@@ -87,7 +78,7 @@ export function extractExperience(resumeText) {
   }
 }
 
-// Helper: Get only the "Experience" section
+// Extract "Experience" section
 function getExperienceSection(originalText) {
   const lowerText = originalText.toLowerCase();
   const sectionHeaders = [
@@ -105,18 +96,14 @@ function getExperienceSection(originalText) {
     const headerPos = lowerText.indexOf(header.toLowerCase());
     if (headerPos === -1) continue;
 
-    const sectionEnd = findSectionEnd(
-      originalText,
-      lowerText,
-      headerPos + header.length
-    );
+    const sectionEnd = findSectionEnd(originalText, lowerText, headerPos + header.length);
     return originalText.substring(headerPos + header.length, sectionEnd).trim();
   }
 
   return null;
 }
 
-// Helper: Find where the Experience section ends (when next section starts)
+// Find section end by locating next section start
 function findSectionEnd(originalText, lowerText, startPos) {
   const endMarkers = [
     "education",
@@ -139,7 +126,7 @@ function findSectionEnd(originalText, lowerText, startPos) {
   return earliestEnd;
 }
 
-// Helper: Parse many types of date formats
+// Parse start/end dates from strings
 function parseDate(dateStr) {
   if (!dateStr || typeof dateStr !== "string") {
     throw new Error("Invalid date input");
@@ -148,44 +135,32 @@ function parseDate(dateStr) {
   const cleaned = dateStr
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s\/\-]/gi, ""); // remove symbols
+    .replace(/[^a-z0-9\s\/\-]/gi, "");
 
   if (/^(present(ly)?|current(ly)?|now|till\s+date|ongoing)$/i.test(cleaned)) {
     return new Date();
   }
 
   const monthMap = {
-    jan: "01",
-    january: "01",
-    feb: "02",
-    february: "02",
-    mar: "03",
-    march: "03",
-    apr: "04",
-    april: "04",
+    jan: "01", january: "01",
+    feb: "02", february: "02",
+    mar: "03", march: "03",
+    apr: "04", april: "04",
     may: "05",
-    jun: "06",
-    june: "06",
-    jul: "07",
-    july: "07",
-    aug: "08",
-    august: "08",
-    sep: "09",
-    sept: "09",
-    september: "09",
-    oct: "10",
-    october: "10",
-    nov: "11",
-    november: "11",
-    dec: "12",
-    december: "12",
+    jun: "06", june: "06",
+    jul: "07", july: "07",
+    aug: "08", august: "08",
+    sep: "09", sept: "09", september: "09",
+    oct: "10", october: "10",
+    nov: "11", november: "11",
+    dec: "12", december: "12",
   };
 
   const formats = [
-    /(\b[a-z]{3,9})[\s\-]+(\d{4})\b/i, // October 2024 or Oct-2024
-    /(\d{1,2})[\/\-](\d{4})/, // 03/2024, 3-2024
-    /^\d{4}$/, // Just year: 2024
-    /(?:Q|Quarter )([1-4])\s+(\d{4})/i, // Q1 2023
+    /(\b[a-z]{3,9})[\s\-]?(\d{4})\b/i, // Oct 2024 or October 2024
+    /(\d{1,2})[\/\-](\d{4})/, // 03/2024
+    /^\d{4}$/, // Just year
+    /(?:Q|Quarter )([1-4])\s+(\d{4})/i, // Q2 2020
   ];
 
   for (const pattern of formats) {
@@ -193,12 +168,10 @@ function parseDate(dateStr) {
     if (!match) continue;
 
     if (pattern === formats[0]) {
-      const rawMonth = match[1].slice(0, 3); // Ensure it's a valid prefix
+      const rawMonth = match[1].slice(0, 3).toLowerCase();
       const year = match[2];
       const month = monthMap[rawMonth];
-      if (month && year) {
-        return new Date(`${year}-${month}-01`);
-      }
+      if (month && year) return new Date(`${year}-${month}-01`);
     } else if (pattern === formats[1]) {
       const [_, month, year] = match;
       return new Date(`${year}-${month.padStart(2, "0")}-01`);
@@ -212,7 +185,6 @@ function parseDate(dateStr) {
     }
   }
 
-  // Fallback: try to extract any recognizable year-month pattern manually
   const fallbackMatch = cleaned.match(/(\d{4})/);
   if (fallbackMatch) {
     return new Date(`${fallbackMatch[1]}-01-01`);
@@ -220,3 +192,4 @@ function parseDate(dateStr) {
 
   throw new Error("Unrecognized date format: " + dateStr);
 }
+
